@@ -59,7 +59,9 @@ class AuthController {
             if (!session) {
                 return ThrowError_1.default.error401(res, "Unauthorized");
             }
-            return Success_1.default.ok(res, "Session active", session);
+            return Success_1.default.ok(res, "Session active", {
+                user: req.user,
+            });
         }
         catch (error) {
             console.log(error);

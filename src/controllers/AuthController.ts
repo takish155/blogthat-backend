@@ -67,7 +67,9 @@ export default class AuthController {
         return Throw.error401(res, "Unauthorized");
       }
 
-      return Success.ok(res, "Session active", session);
+      return Success.ok(res, "Session active", {
+        user: req.user,
+      });
     } catch (error) {
       console.log(error);
       return Throw.error500(res, error);
