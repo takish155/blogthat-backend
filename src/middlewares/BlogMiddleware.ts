@@ -1,0 +1,93 @@
+import { Request, Response, NextFunction } from "express-serve-static-core";
+import BlogValidation from "../validation/BlogValidation";
+import { prisma } from "../config/prisma";
+import Throw from "../util/ThrowError";
+
+const { blogQueryValidation, blogFieldValidation } = BlogValidation;
+
+export default class BlogMiddleware {
+  /**
+   *  Check if query params is valid for getting blog
+   */
+
+  public static checkBlogQuery(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const validation = blogQueryValidation.safeParse(req.query);
+    if (!validation.success) {
+      return Throw.error400(res, "Invalid query", validation.error.errors);
+    }
+
+    next();
+  }
+
+  /**
+   * Check if blog field is valid for creating or updating blog
+   */
+  public static checkBlogField(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const validation = blogFieldValidation.safeParse(req.body);
+    if (!validation.success) {
+      return Throw.error400(res, "Invalid blog field", validation.error.errors);
+    }
+
+    next();
+  }
+
+  /**
+   * Check if blog exists
+   */
+  public static async checkBlogExists(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const blog = await prisma.blog.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!blog) {
+        return Throw.error400(res, "Blog not found", null);
+      }
+
+      next();
+    } catch (error) {
+      return Throw.error500(res, error);
+    }
+  }
+
+  /**
+   * Check if blog is owned by user
+   */
+  public static async checkBlogOwnership(
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const blog = await prisma.blog.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (blog?.authorId !== req.user) {
+        return Throw.error400(res, "Unauthorized", null);
+      }
+
+      next();
+    } catch (error) {
+      return Throw.error500(res, error);
+    }
+  }
+}

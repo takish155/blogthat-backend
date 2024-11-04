@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Session {
+  id        String    @id @default(uuid())
+  sid       String    @unique
+  expiresAt DateTime?
+  data      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  username  String    @unique
+  profile   String?   @default("none")
+  about     String?
+  password  String
+  role      String    @default("user")
+  createdAt DateTime  @default(now())
+  blog      Blog[]
+  userComments  BlogComment[]
+  userLikes     BlogLike[]
+
+  @@unique([id, username])
+}
+
+model Blog {
+  id             String    @id @default(cuid())
+  author         User      @relation(fields: [authorId, authorUsername], references: [id, username])
+  authorId       String
+  authorUsername String
+  title          String
+  description    String
+  body           String
+  category       String
+  thumbnail      String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now())
+  comments       BlogComment[]
+  likeCount      Int       @default(0)
+  likes          BlogLike[]
+}
+
+model BlogLike {
+  id        String   @id @default(cuid())
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  blogId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model BlogComment {
+  id             String   @id @default(cuid())
+  author         User     @relation(fields: [authorId, authorUsername], references: [id, username])
+  authorId       String
+  authorUsername String
+  blog           Blog     @relation(fields: [blogId], references: [id])
+  blogId         String
+  body           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
+}
