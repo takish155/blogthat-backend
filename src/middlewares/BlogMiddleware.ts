@@ -82,7 +82,10 @@ export default class BlogMiddleware {
       });
 
       if (blog?.authorId !== req.user) {
-        return Throw.error400(res, "Unauthorized", null);
+        return Throw.error403(
+          res,
+          "You are not authorized to perform this action"
+        );
       }
 
       next();

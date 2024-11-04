@@ -20,8 +20,7 @@ export default class BlogValidation {
     category: z
       .enum(["tips", "funny", "bussiness", "celebrity", "politics", "other"])
       .optional(),
-    commentLike: z.enum(["desc", "asc"]).optional(),
-    uploadDate: z.enum(["desc", "asc"]).optional(),
+    orderBy: z.enum(["asc", "desc"]).optional(),
     cursor: z.string().optional(),
     query: z.string().optional(),
   });

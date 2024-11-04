@@ -6,11 +6,13 @@ import passport from "passport";
 import PrismaSessionStore from "./config/PrismaSessionStore";
 import "./config/strategy/localStrategy";
 import { authRouter } from "./routes/auth";
+import { userRouter } from "./routes/user";
+import { blogRouter } from "./routes/blog";
 
 const app = express();
 
 const PORT = process.env.PORT || 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_URL = process.env.FRONTEND_URL || "*";
 const SESSION_SECRET = process.env.SESSION_SECRET || "secret";
 
 // cors
@@ -41,6 +43,8 @@ app.use(passport.session());
 
 // routes
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/blog", blogRouter);
 
 app.listen(PORT, () => {
   console.log("Server is listening on port " + PORT);

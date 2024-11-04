@@ -16,6 +16,9 @@ export default class AuthMiddleware {
     next();
   }
 
+  /**
+   * Checks if user is authenticated
+   */
   public static authMiddleware(
     req: Request,
     res: Response,

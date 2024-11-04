@@ -14,7 +14,7 @@ export default class BlogController {
     res: Response
   ) {
     try {
-      const { category, commentLike, uploadDate, cursor, query } = req.query;
+      const { category, cursor, query, orderBy } = req.query;
 
       // Get blog with limit of 10 curosor
       if (!cursor) {
@@ -29,12 +29,14 @@ export default class BlogController {
             },
           },
           orderBy: {
-            createdAt: uploadDate === "desc" ? "desc" : "asc",
-            likeCount: commentLike === "desc" ? "desc" : "asc",
+            createdAt: orderBy ?? "desc",
           },
         });
 
-        return blog;
+        return Success.ok(res, "Successfully get blog", {
+          cursor: blog.length > 0 ? blog[blog.length - 1].id : null,
+          blog,
+        });
       }
 
       const blog = await prisma.blog.findMany({
@@ -47,10 +49,6 @@ export default class BlogController {
           title: {
             contains: query ?? undefined,
           },
-        },
-        orderBy: {
-          createdAt: uploadDate === "desc" ? "desc" : "asc",
-          likeCount: commentLike === "desc" ? "desc" : "asc",
         },
       });
 
@@ -68,6 +66,7 @@ export default class BlogController {
    */
   public static async getBlogById(req: Request<{ id: string }>, res: Response) {
     try {
+      // const cachedBlog = null;
       const cachedBlog = await client.get(`/blog/${req.params.id}`);
       if (!cachedBlog) {
         const blog = await prisma.blog.findUnique({
@@ -84,7 +83,7 @@ export default class BlogController {
 
         return Success.ok(res, "Successfully get blog", blog);
       }
-      return Success.ok(res, "Successfully get blog", cachedBlog);
+      return Success.ok(res, "Successfully get blog", JSON.parse(cachedBlog));
     } catch (error) {
       console.log(error);
       return Throw.error500(res, error);
@@ -162,20 +161,13 @@ export default class BlogController {
           thumbnail,
           author: {
             connect: {
-              id: req.user as string,
+              id: req.user as string as string,
             },
           },
         },
       });
 
       await client.set(`/blog/${blog.id}`, JSON.stringify(blog));
-
-      // return res.status(201).send({
-      //   status: "success",
-      //   message: "Successfully create blog",
-      //   data: null,
-      //   error: null,
-      // });
 
       return Success.created(res, "Successfully created blog");
     } catch (error) {

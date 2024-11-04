@@ -1,7 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import AuthMiddleware from "../middlewares/AuthMiddleware";
-import AuthController from "../controllers/authController";
+import AuthController from "../controllers/AuthController";
 
 export const authRouter = Router();
 

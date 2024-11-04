@@ -46,10 +46,10 @@ export default class Throw {
    * Throw 403 Forbidden error
    *
    */
-  public static error403(res: Response, message: string, error: any) {
+  public static error403(res: Response, message?: string, error?: any) {
     return res.status(403).send({
       status: "error",
-      message,
+      message: message ?? "Your request is forbidden",
       data: null,
       error: null,
     });

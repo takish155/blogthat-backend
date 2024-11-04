@@ -7,6 +7,7 @@ import UserValidation, {
   UpdateUsernameType,
 } from "../validation/UserValidation";
 import Throw from "../util/ThrowError";
+import AuthValidation from "../validation/AuthValidation";
 
 const { updateEmail, updatePassword, updateUsername } = UserValidation;
 
@@ -49,12 +50,14 @@ export default class UserMiddleware {
    *
    */
   public static async updateUserMiddleware(
-    req: Request<{}, {}, UpdatePasswordType>,
+    req: Request<{}, {}, { password: string }>,
     res: Response,
     next: NextFunction
   ) {
     try {
-      const validation = updatePassword.safeParse(req.body);
+      const validation = AuthValidation.authValidation.password.safeParse(
+        req.body.password
+      );
 
       if (!validation.success) {
         return Throw.error400(
@@ -65,7 +68,7 @@ export default class UserMiddleware {
       }
 
       const user = await prisma.user.findUnique({
-        where: { id: req.user },
+        where: { id: req.user as string },
       });
       if (!user) {
         return Throw.error400(res, "User not found", null);
