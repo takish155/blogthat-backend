@@ -10,9 +10,18 @@ const {
   getBlogById,
   getRecommendedBlog,
   updateBlog,
+  createComment,
+  deleteComent,
+  getCommentByBlogId,
 } = BlogController;
 
-const { checkBlogField, checkBlogOwnership, checkBlogQuery } = BlogMiddleware;
+const {
+  checkBlogField,
+  checkBlogOwnership,
+  checkBlogQuery,
+  checkCommentField,
+  checkBlogExists,
+} = BlogMiddleware;
 
 const { authMiddleware } = AuthMiddleware;
 
@@ -32,3 +41,18 @@ blogRouter.put(
   updateBlog
 );
 blogRouter.delete("/:id", authMiddleware, checkBlogOwnership, deleteBlog);
+
+blogRouter.get("/:id/comment", checkBlogExists, getCommentByBlogId);
+blogRouter.post(
+  "/:id/comment",
+  authMiddleware,
+  checkBlogExists,
+  checkCommentField,
+  createComment
+);
+blogRouter.delete(
+  "/:id/comment/:commentId",
+  authMiddleware,
+  checkBlogExists,
+  deleteComent
+);

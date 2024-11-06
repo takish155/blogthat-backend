@@ -3,31 +3,35 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
-import PrismaSessionStore from "./config/PrismaSessionStore";
 import "./config/strategy/localStrategy";
 import { authRouter } from "./routes/auth";
 import { userRouter } from "./routes/user";
 import { blogRouter } from "./routes/blog";
+import helmet from "helmet";
+import RedisSessionStore from "./config/RedisSessionStore";
 
 const app = express();
 
 const PORT = process.env.PORT || 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || "*";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 const SESSION_SECRET = process.env.SESSION_SECRET || "secret";
 
 // cors
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: [FRONTEND_URL, "http://localhost:5173"],
     credentials: true,
   })
 );
+
+// helmet security
+app.use(helmet());
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   session({
-    store: new PrismaSessionStore(),
+    store: new RedisSessionStore(),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,

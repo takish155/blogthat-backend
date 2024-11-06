@@ -25,4 +25,7 @@ BlogValidation.blogFieldValidation = zod_1.z.object({
     ]),
     thumbnail: zod_1.z.string().max(255).optional(),
 });
+BlogValidation.createCommentValidation = zod_1.z.object({
+    body: zod_1.z.string().min(3).max(255),
+});
 exports.default = BlogValidation;

@@ -1,4 +1,5 @@
 "use strict";
+// src/config/redis.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.client = void 0;
 const redis_1 = require("redis");

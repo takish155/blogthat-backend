@@ -1,5 +1,9 @@
 import { Request, Response } from "express-serve-static-core";
-import { BlogFieldType, BlogQueryType } from "../validation/BlogValidation";
+import {
+  BlogFieldType,
+  BlogQueryType,
+  CreateCommentType,
+} from "../validation/BlogValidation";
 import { prisma } from "../config/prisma";
 import { client } from "../config/redis";
 import Success from "../util/Success";
@@ -53,7 +57,12 @@ export default class BlogController {
       });
 
       return Success.ok(res, "Successfully get blog", {
-        cursor: blog.length > 0 ? blog[blog.length - 1].id : null,
+        cursor:
+          blog.length === 10
+            ? blog.length > 0
+              ? blog[blog.length - 1].id
+              : null
+            : null,
         blog,
       });
     } catch (error) {
@@ -228,6 +237,97 @@ export default class BlogController {
       return Success.noContent(res);
     } catch (error) {
       console.log(error);
+      return Throw.error500(res, error);
+    }
+  }
+
+  /**
+   * Get comment of a blog by id with limit of 10
+   */
+  public static async getCommentByBlogId(
+    req: Request<
+      {
+        id: string;
+      },
+      {},
+      {},
+      {
+        cursor: string;
+      }
+    >,
+    res: Response
+  ) {
+    try {
+      const comments = await prisma.blogComment.findMany({
+        where: {
+          blogId: req.params.id,
+        },
+        cursor: {
+          id: req.query.cursor ?? undefined,
+        },
+        take: 10,
+      });
+
+      return Success.ok(res, "Successfully get comments", {
+        cursor: comments.length > 0 ? comments[comments.length - 1].id : null,
+        comments,
+      });
+    } catch (error) {
+      return Throw.error500(res, error);
+    }
+  }
+
+  /**
+   * Delete comment of a blog by id
+   */
+  public static async createComment(
+    req: Request<
+      {
+        id: string;
+      },
+      {},
+      CreateCommentType
+    >,
+    res: Response
+  ) {
+    try {
+      const { body } = req.body;
+
+      await prisma.blogComment.create({
+        data: {
+          body: body,
+          author: {
+            connect: {
+              id: req.user as string as string,
+            },
+          },
+          blog: {
+            connect: {
+              id: req.params.id,
+            },
+          },
+        },
+      });
+
+      return Success.created(res, "Successfully created comment");
+    } catch (error) {
+      return Throw.error500(res, error);
+    }
+  }
+
+  public static async deleteComent(
+    req: Request<{ id: string; commentId: string }>,
+    res: Response
+  ) {
+    try {
+      await prisma.blogComment.delete({
+        where: {
+          id: req.params.commentId,
+        },
+      });
+
+      return Success.noContent(res);
+    } catch (error) {
       return Throw.error500(res, error);
     }
   }

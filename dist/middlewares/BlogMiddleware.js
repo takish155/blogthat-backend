@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const BlogValidation_1 = __importDefault(require("../validation/BlogValidation"));
 const prisma_1 = require("../config/prisma");
 const ThrowError_1 = __importDefault(require("../util/ThrowError"));
-const { blogQueryValidation, blogFieldValidation } = BlogValidation_1.default;
+const { blogQueryValidation, blogFieldValidation, createCommentValidation } = BlogValidation_1.default;
 class BlogMiddleware {
     /**
      *  Check if query params is valid for getting blog
@@ -80,6 +80,38 @@ class BlogMiddleware {
                 return ThrowError_1.default.error500(res, error);
             }
         });
+    }
+    /**
+     * Check if comment is owned by user
+     */
+    static checkCommentOwnership(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id, commentId } = req.params;
+                const comment = yield prisma_1.prisma.blogComment.findUnique({
+                    where: {
+                        id: commentId,
+                    },
+                });
+                if ((comment === null || comment === void 0 ? void 0 : comment.authorId) !== req.user) {
+                    return ThrowError_1.default.error403(res, "You are not authorized to perform this action");
+                }
+                next();
+            }
+            catch (error) {
+                return ThrowError_1.default.error500(res, error);
+            }
+        });
+    }
+    /**
+     * Check if comment field is valid
+     */
+    static checkCommentField(req, res, next) {
+        const validation = createCommentValidation.safeParse(req.body);
+        if (!validation.success) {
+            return ThrowError_1.default.error400(res, "Invalid comment field", validation.error.errors);
+        }
+        next();
     }
 }
 exports.default = BlogMiddleware;

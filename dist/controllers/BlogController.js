@@ -58,7 +58,11 @@ class BlogController {
                     },
                 });
                 return Success_1.default.ok(res, "Successfully get blog", {
-                    cursor: blog.length > 0 ? blog[blog.length - 1].id : null,
+                    cursor: blog.length === 10
+                        ? blog.length > 0
+                            ? blog[blog.length - 1].id
+                            : null
+                        : null,
                     blog,
                 });
             }
@@ -202,6 +206,76 @@ class BlogController {
             }
             catch (error) {
                 console.log(error);
+                return ThrowError_1.default.error500(res, error);
+            }
+        });
+    }
+    /**
+     * Get comment of a blog by id with limit of 10
+     */
+    static getCommentByBlogId(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const comments = yield prisma_1.prisma.blogComment.findMany({
+                    where: {
+                        blogId: req.params.id,
+                    },
+                    cursor: {
+                        id: (_a = req.query.cursor) !== null && _a !== void 0 ? _a : undefined,
+                    },
+                    take: 10,
+                });
+                return Success_1.default.ok(res, "Successfully get comments", {
+                    cursor: comments.length > 0 ? comments[comments.length - 1].id : null,
+                    comments,
+                });
+            }
+            catch (error) {
+                return ThrowError_1.default.error500(res, error);
+            }
+        });
+    }
+    /**
+     * Delete comment of a blog by id
+     */
+    static createComment(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { body } = req.body;
+                yield prisma_1.prisma.blogComment.create({
+                    data: {
+                        body: body,
+                        author: {
+                            connect: {
+                                id: req.user,
+                            },
+                        },
+                        blog: {
+                            connect: {
+                                id: req.params.id,
+                            },
+                        },
+                    },
+                });
+                return Success_1.default.created(res, "Successfully created comment");
+            }
+            catch (error) {
+                return ThrowError_1.default.error500(res, error);
+            }
+        });
+    }
+    static deleteComent(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield prisma_1.prisma.blogComment.delete({
+                    where: {
+                        id: req.params.commentId,
+                    },
+                });
+                return Success_1.default.noContent(res);
+            }
+            catch (error) {
                 return ThrowError_1.default.error500(res, error);
             }
         });

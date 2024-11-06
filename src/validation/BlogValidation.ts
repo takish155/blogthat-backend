@@ -39,7 +39,14 @@ export default class BlogValidation {
     ]),
     thumbnail: z.string().max(255).optional(),
   });
+
+  public static createCommentValidation = z.object({
+    body: z.string().min(3).max(255),
+  });
 }
 
 export type BlogQueryType = z.infer<typeof BlogValidation.blogQueryValidation>;
 export type BlogFieldType = z.infer<typeof BlogValidation.blogFieldValidation>;
+export type CreateCommentType = z.infer<
+  typeof BlogValidation.createCommentValidation
+>;

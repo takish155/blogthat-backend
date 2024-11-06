@@ -39,11 +39,11 @@ exports.default = passport_1.default.use(new passport_local_1.Strategy((username
             where: { username },
         });
         if (!user) {
-            throw new Error("USER_NOT_FOUND");
+            throw new Error("Invalid credentials");
         }
         const passwordMatch = yield bcryptjs_1.default.compare(password, user.password);
         if (!passwordMatch) {
-            throw new Error("PASSWORD_INCORRECT");
+            throw new Error("Invalid credentials");
         }
         done(null, user.id);
     }

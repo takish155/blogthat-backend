@@ -29,12 +29,12 @@ export default passport.use(
         where: { username },
       });
       if (!user) {
-        throw new Error("USER_NOT_FOUND");
+        throw new Error("Invalid credentials");
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
-        throw new Error("PASSWORD_INCORRECT");
+        throw new Error("Invalid credentials");
       }
 
       done(null, user.id);
