@@ -43,7 +43,8 @@ app.use((0, express_session_1.default)({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
-        sameSite: "lax",
+        sameSite: "none",
+        secure: true,
     },
 }));
 // passport
