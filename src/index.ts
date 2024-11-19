@@ -19,7 +19,11 @@ const SESSION_SECRET = process.env.SESSION_SECRET || "secret";
 // cors
 app.use(
   cors({
-    origin: [FRONTEND_URL, "http://localhost:5173"],
+    origin: [
+      FRONTEND_URL,
+      "http://localhost:5173",
+      "https://blogthat.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -36,7 +40,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
+      secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
       maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust for cross-origin
     },
   })
 );
