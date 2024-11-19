@@ -42,6 +42,7 @@ app.use((0, express_session_1.default)({
         sameSite: "none",
         httpOnly: true,
         secure: true,
+        domain: "blogthat.vercel.app",
     },
 }));
 // passport

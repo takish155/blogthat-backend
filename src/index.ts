@@ -45,6 +45,7 @@ app.use(
       sameSite: "none",
       httpOnly: true,
       secure: true,
+      domain: "blogthat.vercel.app",
     },
   })
 );
