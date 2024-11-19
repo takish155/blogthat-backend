@@ -7,7 +7,6 @@ import "./config/strategy/localStrategy";
 import { authRouter } from "./routes/auth";
 import { userRouter } from "./routes/user";
 import { blogRouter } from "./routes/blog";
-import helmet from "helmet";
 import RedisSessionStore from "./config/RedisSessionStore";
 
 const app = express();
@@ -29,13 +28,13 @@ app.use(
 );
 
 // helmet security
-app.use(
-  helmet({
-    contentSecurityPolicy: false, // Disable CSP in dev to avoid interference
-    hsts: false, // Disable HSTS in development (no HTTPS)
-    crossOriginEmbedderPolicy: false, // Allow cross-origin embedding
-  })
-);
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: false, // Disable CSP in dev to avoid interference
+//     hsts: false, // Disable HSTS in development (no HTTPS)
+//     crossOriginEmbedderPolicy: false, // Allow cross-origin embedding
+//   })
+// );
 
 app.use(express.json());
 app.use(cookieParser());
