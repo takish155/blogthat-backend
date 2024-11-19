@@ -29,7 +29,13 @@ app.use(
 );
 
 // helmet security
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Disable CSP in dev to avoid interference
+    hsts: false, // Disable HSTS in development (no HTTPS)
+    crossOriginEmbedderPolicy: false, // Allow cross-origin embedding
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -40,9 +46,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
       maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust for cross-origin
     },
   })
 );

@@ -28,7 +28,11 @@ app.use((0, cors_1.default)({
     credentials: true,
 }));
 // helmet security
-app.use((0, helmet_1.default)());
+app.use((0, helmet_1.default)({
+    contentSecurityPolicy: false, // Disable CSP in dev to avoid interference
+    hsts: false, // Disable HSTS in development (no HTTPS)
+    crossOriginEmbedderPolicy: false, // Allow cross-origin embedding
+}));
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, express_session_1.default)({
@@ -37,9 +41,7 @@ app.use((0, express_session_1.default)({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust for cross-origin
     },
 }));
 // passport
