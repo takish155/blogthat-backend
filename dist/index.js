@@ -43,7 +43,7 @@ app.use((0, express_session_1.default)({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Cross-origin in production
+        sameSite: "none",
     },
 }));
 // passport
