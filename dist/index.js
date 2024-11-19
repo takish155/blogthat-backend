@@ -19,11 +19,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 const SESSION_SECRET = process.env.SESSION_SECRET || "secret";
 // cors
 app.use((0, cors_1.default)({
-    origin: [
-        FRONTEND_URL,
-        "http://localhost:5173",
-        "https://blogthat.vercel.app",
-    ],
+    origin: "https://blogthat.vercel.app",
     credentials: true,
 }));
 // helmet security
@@ -44,7 +40,8 @@ app.use((0, express_session_1.default)({
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
         sameSite: "none",
-        httpOnly: false,
+        httpOnly: true,
+        secure: true,
     },
 }));
 // passport
